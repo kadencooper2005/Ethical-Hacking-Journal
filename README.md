@@ -86,6 +86,9 @@ Some great tools to use during the process include:
   - **Meterpreter**: Advanced post-exploitation payload
 - **Burp Suite**: Web application testing
 - **John the Ripper / Hashcat**: Password cracking
+- **Winpeas.exe** is a script that will search for all possible paths to escalate privileges on Windows hosts
+- **LINpeas: a popular, open-source script used in cybersecurity to identify potential vulnerabilities and misconfigurations that can lead to
+privilege escalation on Linux, Unix, and macOS systems. 
 
 **Corporate Tools**:
 - Nmap, Nessus, Burp Suite Pro, Cobalt Strike, BloodHound, Responder, Impacket, CrackMapExec
@@ -102,6 +105,8 @@ Some great tools to use during the process include:
 - **Responder**: Poison network protocols and capture authentication credentials
 - **Hashcat**: Cracking hashes  
   - Syntax: `hashcat -m <hashfile> <path/to/passlist>`
+- **Smbclient**: used to find what kind of shares a system has
+- **certutil**: sorta like a wget 
 
 ---
 
@@ -151,7 +156,6 @@ This is the **most important part** of the methodology:
 
 ## 🧮 Linux Commands
 
-```bash
 ls        # list all content in a dir
 cd        # switches dir
 ls -la    # list hidden files
@@ -161,6 +165,10 @@ cp        # copies files
 locate    # finds files you name
 grep      # pulls out the line
 cut       # cuts a line (-d specifies delimiter)
+wget      # file transfer command
+mysql: this is used to connect to a mysql server/database. syntax is mysql -h <IP_ADDRESS> -u <USER> 
+smbclient: to check share etc 
+
 
 # Permissions
 chmod +x         # add execute permission
@@ -195,7 +203,14 @@ arp -a         # list IP and MAC address pairs
 netstat -ano   # show open ports and connections
 route          # display routing info
 
-⚙️ Installing Tools & Starting Services
+# cron/crontab
+is a time based job scheduler in unix-like operating systems.
+it automates the execution of taks at specific intervals
+
+cronjob is used to manage cron
+
+
+# Installing Tools & Starting Services
 
 apt-get install <tool>               # install tools
 service apache2 start               # start Apache web server
@@ -206,9 +221,13 @@ python3 -m http.server 80           # start Python web server
 
 📡 Protocols
 
-    TCP: Connection-oriented, reliable (used in apps needing guaranteed delivery)
+TCP: Connection-oriented, reliable (used in apps needing guaranteed delivery)
 
     UDP: Connectionless, faster, but less reliable (used in video/audio streaming)
+
+ Kerberoasting
+  this is an authentication protocol that uses tickets as a form of communication and authentication.
+  
 
 Stealth Scan (TCP 3-way Handshake):
 
@@ -290,6 +309,9 @@ Staged Payloads
 
     Often done via Meterpreter shell
 
-🧪 LLMNR Poisoning
 
-    (To be expanded – placeholder for techniques using Responder or similar tools)
+# Projects 
+I need to show that I am capable and competent of doing this work. I understand what i'm doing, 
+how things work. first I can use wireshark to catch my own traffic over my LAN, figure out how to simulate an "attack" however that might be. 
+
+
