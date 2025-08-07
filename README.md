@@ -182,17 +182,17 @@ su               # switch user
 
 Permissions Format (ls -la):
 
-    File/folder owner
+  File/folder owner
 
-    Group owner
+  Group owner
 
-    Others
+  Others
 
-    rw: read/write
+  rw: read/write
 
-    rwx: read/write/execute
+  rwx: read/write/execute
 
-    - = file, d = directory
+   - = file, d = directory
 
 🌐 Network Commands
 
