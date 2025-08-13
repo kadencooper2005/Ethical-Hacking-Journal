@@ -41,6 +41,7 @@ I then ran the cronjob, ls the /tmp folder and there was my cronjob, then i sear
 found my user flag. 
 
 
+**Found Machine Info**
 ---------------------------------
 
 ----- Ports ------
@@ -70,3 +71,4 @@ grafana.planning.htb
 
 machine is using php
 ---------------------------------
+
