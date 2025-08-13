@@ -166,8 +166,10 @@ locate    # finds files you name
 grep      # pulls out the line
 cut       # cuts a line (-d specifies delimiter)
 wget      # file transfer command
+ps aux    # displays all running processes on the system
 mysql: this is used to connect to a mysql server/database. syntax is mysql -h <IP_ADDRESS> -u <USER> 
 smbclient: to check share etc 
+
 
 
 # Permissions
@@ -227,6 +229,27 @@ TCP: Connection-oriented, reliable (used in apps needing guaranteed delivery)
 
  Kerberoasting
   this is an authentication protocol that uses tickets as a form of communication and authentication.
+  we have accounts called service accounts which run services like SQL server, IIS etc. these accounts are tied to SPNs (Service Principal Names)
+  any authenticated user can request a Kerberos service ticket (TGS) for these spns
+  the TGS is encrypted with the service accounts NTLM hash (Derived from its password)
+  you can request them, dump them, then brute force them offline.
+
+  DCSync:
+
+  Normally, Domain Controllers replicate AD data to each other.
+
+  Certain privileged accounts (like Domain Admins, Enterprise Admins, and accounts with Replicating Directory Changes All rights) can ask a DC for its password data — including NTLM hashes for all accounts.
+
+  DCSync tricks a DC into thinking you’re another DC requesting replication.
+
+DCShadow:
+
+  More advanced — lets you register a fake DC in AD, then push malicious changes into the AD database (e.g., adding yourself to Domain Admins or modifying security descriptors).
+
+  It’s harder to detect because it uses legitimate replication traffic.
+
+Why they work:
+AD trusts anything it thinks is another Domain Controller, and those replication rights can be abused if given to the wrong account.
   
 
 Stealth Scan (TCP 3-way Handshake):
@@ -310,8 +333,37 @@ Staged Payloads
     Often done via Meterpreter shell
 
 
-# Projects 
-I need to show that I am capable and competent of doing this work. I understand what i'm doing, 
-how things work. first I can use wireshark to catch my own traffic over my LAN, figure out how to simulate an "attack" however that might be. 
+# Windows hacking
+theres more to hacking windows than just AD, although it is dominant in many and most likely most enterprises because it's basically the central hub where everyone and everything is connected; you can use other methods. for instance 
+local priv escalation, network service exploits and social engineering can too become much more important in some cases
+
+we always should check if there are any sensitive ports that might be open like SMB, RDP and RPC/DCOM as these services have known vulns and should not be exposed. 
+
+we also have credential theft: once on a windows system you can do the following to check for credentials, 
+Dumping lsass memory with mimikatz
+Extract saved browser passwords
+Dump SAM/NTDs.dit files
+Harvest RDP saved credentials
+Clipboard sniffing for passwords and etc. 
+
+
+Physical and Offline Attacks:
+Boot from USB and dump SAM database
+Remove or reset Windows password hashes
+Evil Maid attacks (installing persistence via firmware or bootkits)
+Cold boot attacks to recover encryption keys from RAM
+
+Local Priv Esc:
+
+Unpatched vulnerabilities (e.g., PrintNightmare, CVE-2021-34527)
+DLL hijacking (dropping malicious DLLs where a privileged app loads them)
+Weak folder/file permissions (overwriting service executables)
+Token impersonation (SeImpersonatePrivilege abuse with Juicy Potato/Rogue Potato)
+Abusing scheduled tasks with weak permissions
+
+
+
+
+
 
 
