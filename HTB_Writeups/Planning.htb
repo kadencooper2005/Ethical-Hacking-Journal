@@ -1,0 +1,72 @@
+Date: 08/13/2025
+
+Machine: Planning
+
+Server Version:
+
+nginx/1.24.0 (Ubuntu): Port 80
+
+I used nmap to loop for any open services/ports and found port 80, 22
+
+I visited port 80 (webpage) and found the domain of planning.htb, I then added that to my /etc/hosts file to access the site.
+This in itself didn't contain much so I scanned using gobuster to find any hidden sub-domains/directories and found grafana.planning.htb.
+I Added that to my /etc/hosts file and was directed to a grafana login panel
+
+I used the admin/0D5oT70Fq13EvB5r credentials and boom, I'm now facing a dashboard for the admin user. 
+
+I did some further enumeration on the dashboard, didn't find much, but then checked the version of grafana that was running and got 
+Grafana v11.0.0 (83b9528bce) which is located at grafana.planning.htb on port 80, and turns out this version is vulnerable to CVE-2024–9264!
+
+this is an authenticated RCE exploit, you can find a github repo that provides a script to help with exploitation. 
+
+I then generated a pearl shell for further enumeration and uploaded it to grafana.planning.htb using the provided script from the exploit
+
+I ran the given script with the command whoami to figure out user permisions, the 'admin' user is root. 
+
+commands to dump db to local machine from ssh connection:
+
+scp anzo@planning.htb:/opt/crontabs/crontab.db ./crontab.db
+
+I then found this information which contained more credentials for a different service: 
+
+"name":"Grafana backup","command":"/usr/bin/docker save root_grafana -o /var/backups/grafana.tar && /usr/bin/gzip /var/backups/grafana.tar && zip -P P4ssw0rdS0pRi0T3c /var/backups/grafana.tar.gz.zip /var/backups/grafana.tar.gz && rm /var/backups/grafana.tar.gz","schedule":"@daily","stopped":false,"timestamp":"Fri Feb 28 2025 20:36:23 GMT+0000 (Coordinated Universal Time)","logging":"false","mailing":{},"created":1740774983276,"saved":false,"_id":"GTI22PpoJNtRKg0W"}
+{"name":"Cleanup","command":"/root/scripts/cleanup.sh","schedule":"* * * * *","stopped":false,"timestamp":"Sat Mar 01 2025 17:15:09 GMT+0000 (Coordinated Universal Time)","logging":"false","mailing":{},"created":1740849309992,"saved":false,"_id":"gNIRXh1WIc9K7BYX"}
+
+I then established port forwarding to port 8000, so that I could access the crontab UI
+
+I was greeted with a UI that allows for creation of cronjobs, so I created one that would run /bin/bash to the /tmp/bash directory so I could
+gain root priv. 
+
+I then ran the cronjob, ls the /tmp folder and there was my cronjob, then i searched for the root.txt file using cat/root/root.txt and 
+found my user flag. 
+
+
+---------------------------------
+
+----- Ports ------
+80/http
+22/ssh
+---------------------------------
+User/Password
+
+Possible login
+Grafana login
+admin/0D5oT70Fq13EvB5r
+
+SSH user
+enzo/RioTecRANDEntANT!
+
+Crontab UI
+root/P4ssw0rdS0pRi0T3c
+---------------------------------
+
+Domains
+
+planning.htb on port 80. 
+found using sub-directory enumeration 
+grafana.planning.htb
+
+---------------------------------
+
+machine is using php
+---------------------------------
