@@ -1,74 +1,114 @@
-Date: 08/13/2025
+Date: 2025-08-13
+Target Machine: Planning
 
-Machine: Planning
+1. Reconnaissance and Initial Access
 
-Server Version:
+Service Enumeration:
 
-nginx/1.24.0 (Ubuntu): Port 80
+    Performed an Nmap scan to identify open ports:
 
-I used nmap to loop for any open services/ports and found port 80, 22
+        Port 22 – SSH
 
-I visited port 80 (webpage) and found the domain of planning.htb, I then added that to my /etc/hosts file to access the site.
-This in itself didn't contain much so I scanned using gobuster to find any hidden sub-domains/directories and found grafana.planning.htb.
-I Added that to my /etc/hosts file and was directed to a grafana login panel
+        Port 80 – HTTP (nginx/1.24.0 on Ubuntu)
 
-I used the admin/0D5oT70Fq13EvB5r credentials and boom, I'm now facing a dashboard for the admin user. 
+Web Application Discovery:
 
-I did some further enumeration on the dashboard, didn't find much, but then checked the version of grafana that was running and got 
-Grafana v11.0.0 (83b9528bce) which is located at grafana.planning.htb on port 80, and turns out this version is vulnerable to CVE-2024–9264!
+    Accessed http://planning.htb via Port 80 after adding the domain to /etc/hosts.
 
-this is an authenticated RCE exploit, you can find a github repo that provides a script to help with exploitation. 
+    Initial content was minimal.
 
-I then generated a pearl shell for further enumeration and uploaded it to grafana.planning.htb using the provided script from the exploit
+    Conducted directory and subdomain enumeration using gobuster and discovered:
 
-I ran the given script with the command whoami to figure out user permisions, the 'admin' user is root. 
+        grafana.planning.htb
 
-commands to dump db to local machine from ssh connection:
+Grafana Login:
 
-scp anzo@planning.htb:/opt/crontabs/crontab.db ./crontab.db
+    Added grafana.planning.htb to /etc/hosts and accessed the Grafana login panel.
 
-I then found this information which contained more credentials for a different service: 
+    Successfully authenticated using:
 
-"name":"Grafana backup","command":"/usr/bin/docker save root_grafana -o /var/backups/grafana.tar && /usr/bin/gzip /var/backups/grafana.tar && zip -P P4ssw0rdS0pRi0T3c /var/backups/grafana.tar.gz.zip /var/backups/grafana.tar.gz && rm /var/backups/grafana.tar.gz","schedule":"@daily","stopped":false,"timestamp":"Fri Feb 28 2025 20:36:23 GMT+0000 (Coordinated Universal Time)","logging":"false","mailing":{},"created":1740774983276,"saved":false,"_id":"GTI22PpoJNtRKg0W"}
-{"name":"Cleanup","command":"/root/scripts/cleanup.sh","schedule":"* * * * *","stopped":false,"timestamp":"Sat Mar 01 2025 17:15:09 GMT+0000 (Coordinated Universal Time)","logging":"false","mailing":{},"created":1740849309992,"saved":false,"_id":"gNIRXh1WIc9K7BYX"}
+    admin / 0D5oT70Fq13EvB5r
 
-I then established port forwarding to port 8000, so that I could access the crontab UI
+    Logged in as the admin user and accessed the Grafana dashboard.
 
-I was greeted with a UI that allows for creation of cronjobs, so I created one that would run /bin/bash to the /tmp/bash directory so I could
-gain root priv. 
+2. Vulnerability Identification and Exploitation
 
-I then ran the cronjob, ls the /tmp folder and there was my cronjob, then i searched for the root.txt file using cat/root/root.txt and 
-found my user flag. 
+Grafana Version:
 
+    Identified running version: Grafana v11.0.0 (83b9528bce)
 
-**Found Machine Info**
----------------------------------
+    Vulnerable to CVE-2024-9264 – Authenticated Remote Code Execution (RCE).
 
------ Ports ------
-80/http
-22/ssh
----------------------------------
-User/Password
+    Located exploitation script on GitHub.
 
-Possible login
-Grafana login
-admin/0D5oT70Fq13EvB5r
+Exploitation:
 
-SSH user
-enzo/RioTecRANDEntANT!
+    Generated a Perl reverse shell payload.
 
-Crontab UI
-root/P4ssw0rdS0pRi0T3c
----------------------------------
+    Used the provided CVE exploitation script to upload and execute the payload.
 
-Domains
+    Verified execution via whoami — confirmed admin user had root privileges.
 
-planning.htb on port 80. 
-found using sub-directory enumeration 
-grafana.planning.htb
+3. Post-Exploitation
 
----------------------------------
+Database Extraction via SSH:
 
-machine is using php
----------------------------------
+    Established SSH session and extracted crontab database:
 
+    scp enzo@planning.htb:/opt/crontabs/crontab.db ./crontab.db
+
+Credential Discovery:
+
+    Extracted credentials from crontab database:
+
+    Crontab UI: root / P4ssw0rdS0pRi0T3c
+    SSH: enzo / RioTecRANDEntANT!
+    Grafana: admin / 0D5oT70Fq13EvB5r
+
+    Noted cron entry for daily Grafana backup with password-protected ZIP file.
+
+4. Privilege Escalation via Crontab UI
+
+Port Forwarding:
+
+    Established local port forwarding:
+
+    ssh -L 8000:127.0.0.1:8000 enzo@planning.htb
+
+    Accessed Crontab UI through localhost:8000.
+
+Root Access:
+
+    Created a cronjob to execute /bin/bash in /tmp/bash directory.
+
+    Confirmed execution and located root.txt in /root/.
+
+5. Summary of Findings
+
+Open Ports:
+
+    22/tcp – SSH
+
+    80/tcp – HTTP
+
+Credentials Obtained:
+
+    Grafana: admin / 0D5oT70Fq13EvB5r
+
+    SSH: enzo / RioTecRANDEntANT!
+
+    Crontab UI: root / P4ssw0rdS0pRi0T3c
+
+Discovered Domains:
+
+    planning.htb – Main site
+
+    grafana.planning.htb – Grafana dashboard
+
+Technologies:
+
+    nginx/1.24.0 (Ubuntu)
+
+    Grafana v11.0.0 (vulnerable to CVE-2024-9264)
+
+    PHP
