@@ -1,0 +1,117 @@
+Date: 2025-08-13
+Target Machine: Planning
+
+1. Reconnaissance and Initial Access
+
+Service Enumeration:
+
+    Performed an Nmap scan to identify open ports:
+
+        Port 22 – SSH
+
+        Port 80 – HTTP (nginx/1.24.0 on Ubuntu)
+
+Web Application Discovery:
+
+    Accessed http://planning.htb via Port 80 after adding the domain to /etc/hosts.
+
+    Initial content was minimal.
+
+    Conducted directory and subdomain enumeration using gobuster and discovered:
+
+        grafana.planning.htb
+
+Grafana Login:
+
+    Added grafana.planning.htb to /etc/hosts and accessed the Grafana login panel.
+
+    Successfully authenticated using:
+
+    admin / 0D5oT70Fq13EvB5r
+
+    Logged in as the admin user and accessed the Grafana dashboard.
+
+2. Vulnerability Identification and Exploitation
+
+Grafana Version:
+
+    Identified running version: Grafana v11.0.0 (83b9528bce)
+
+    Vulnerable to CVE-2024-9264 – Authenticated Remote Code Execution (RCE).
+
+    Located exploitation script on GitHub.
+
+Exploitation:
+
+    Generated a Perl reverse shell payload.
+
+    Used the provided CVE exploitation script to upload and execute the payload.
+
+    Verified execution via whoami — confirmed admin user had root privileges.
+
+3. Post-Exploitation
+
+Database Extraction via SSH:
+
+    Established SSH session and extracted crontab database:
+
+    scp enzo@planning.htb:/opt/crontabs/crontab.db ./crontab.db
+
+Credential Discovery:
+
+    Extracted credentials from crontab database:
+
+    Crontab UI: root / P4ssw0rdS0pRi0T3c
+    SSH: enzo / RioTecRANDEntANT!
+    Grafana: admin / 0D5oT70Fq13EvB5r
+
+    Noted cron entry for daily Grafana backup with password-protected ZIP file.
+
+4. Privilege Escalation via Crontab UI
+
+Port Forwarding:
+
+    Established local port forwarding:
+
+    ssh -L 8000:127.0.0.1:8000 enzo@planning.htb
+
+    Accessed Crontab UI through localhost:8000.
+
+Root Access:
+
+    Essentially, this copies the Bash binary to /tmp/bash—a directory accessible by any user—and 
+    then sets the setuid (suid) bit using chmod u+s. This allows anyone who executes /tmp/bash 
+    to run it with root privileges, effectively creating a root shell.
+
+    Confirmed execution and located root.txt in /root/.
+
+5. Summary of Findings
+
+Open Ports:
+
+    22/tcp – SSH
+
+    80/tcp – HTTP
+
+Credentials Obtained:
+
+    Grafana: admin / 0D5oT70Fq13EvB5r
+
+    SSH: enzo / RioTecRANDEntANT!
+
+    Crontab UI: root / P4ssw0rdS0pRi0T3c
+
+Discovered Domains:
+
+    planning.htb – Main site
+
+    grafana.planning.htb – Grafana dashboard
+
+Technologies:
+
+    nginx/1.24.0 (Ubuntu)
+
+    Grafana v11.0.0 (vulnerable to CVE-2024-9264)
+
+    PHP
+
