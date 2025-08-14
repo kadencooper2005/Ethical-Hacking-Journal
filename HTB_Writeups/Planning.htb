@@ -79,7 +79,9 @@ Port Forwarding:
 
 Root Access:
 
-    Created a cronjob to execute /bin/bash in /tmp/bash directory.
+    Essentially, this copies the Bash binary to /tmp/bash—a directory accessible by any user—and 
+    then sets the setuid (suid) bit using chmod u+s. This allows anyone who executes /tmp/bash 
+    to run it with root privileges, effectively creating a root shell.
 
     Confirmed execution and located root.txt in /root/.
 
@@ -112,3 +114,4 @@ Technologies:
     Grafana v11.0.0 (vulnerable to CVE-2024-9264)
 
     PHP
+
