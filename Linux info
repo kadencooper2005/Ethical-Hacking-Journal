@@ -1,1 +1,12 @@
+# Linux info
+Daemons: a daemon in linux is a computer program that runs in the background without the need for 
+user-input. Daemons are designed to perform various system level task and provide services with 
+the need of direct user input like said. they are a fundamental part of the Linuz OS functionality, 
+ensuring that essential services are always available.
+Daemons are usually identified by having a d at the end of their name, such as: sshd, which would be the SSH daemon, 
+crond. which would be the crontab schedular daemon etc. in modern Linux, daemons are managed by the init system like systemd, 
+which handles their startup, shutdown, and monitoring. 
+
+# Linux Commands
+
 
