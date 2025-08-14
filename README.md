@@ -171,7 +171,6 @@ mysql: this is used to connect to a mysql server/database. syntax is mysql -h <I
 smbclient: to check share etc 
 
 
-
 # Permissions
 chmod +x         # add execute permission
 chmod 777        # read, write, execute for all
