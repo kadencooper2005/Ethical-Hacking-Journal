@@ -24,6 +24,118 @@ mysql: this is used to connect to a mysql server/database. syntax is mysql -h <I
 smbclient: to check share etc 
 
 
+
+
+# Active Directory (AD) Attack Reference
+
+Active Directory is a centralized identity and access management system.  
+It stores all users, groups, computers, permissions, and security policies, and controls authentication (proving who you are) and authorization (deciding what you can do).
+
+---
+
+## 1. Password & Authentication Attacks
+
+Kerberoasting — Request Kerberos service tickets for accounts with SPNs, then crack them offline. 
+
+AS-REP Roasting — Request encrypted authentication data for users without pre-authentication and crack it offline. 
+
+Password Spraying — Try a common password across many accounts to avoid lockouts. 
+
+Brute Force — Repeatedly guess one user’s password until it works. 
+
+Credential Dumping — Extract credentials from memory (LSASS), SAM, or LSADump.
+
+Token Theft / Impersonation — Steal authentication tokens from a logged-in session. 
+
+Overpass-the-Hash — Use an NTLM hash to request a Kerberos ticket. Analogy: Turn a stamp into a full hall pass.
+
+Unconstrained Delegation Abuse — Impersonate any user who connects to your service. 
+Constrained Delegation Abuse — Impersonate a user for specific services. 
+
+---
+
+## 2. Trust & Relationship Exploits
+
+SID History Injection — Inject privileged SIDs into a user’s SID history. 
+
+Foreign Security Principal Abuse — Abuse trust relationships between domains. 
+
+Inter-Domain Trust Exploitation — Abuse weak trust rules between domains or forests. 
+
+---
+
+## 3. Lateral Movement
+
+WMI / DCOM Abuse — Remotely execute commands via WMI or DCOM. 
+
+PSExec — Remotely execute commands using service accounts. 
+
+RDP Hijacking — Take over another user’s existing RDP session. 
+
+---
+
+## 4. Persistence
+
+AdminSDHolder Abuse — Modify the AdminSDHolder object so you stay admin even after permission resets. 
+
+Group Policy Object (GPO) Abuse — Deploy malicious policies to multiple machines. 
+
+Startup / Logon Scripts — Deploy persistence via scripts that run on boot or login. 
+
+Directory Services Restore Mode (DSRM) Backdoor — Abuse the DSRM account for emergency access. 
+
+---
+
+## 5. Weak Configuration Exploits
+
+MS14-068 — Kerberos validation flaw that allows privilege escalation. 
+
+Printer Bug — Abuse the print spooler service to coerce authentication. 
+
+PetitPotam — Force a Domain Controller to authenticate to you via NTLM. 
+
+Zerologon — Exploit Netlogon flaw to reset a DC’s password to blank. 
+---
+
+## 6. Domain Controller Direct Attacks
+
+Volume Shadow Copy (VSS) Theft — Copy VSS data to extract credentials. 
+
+NTDS.dit Extraction — Steal the AD database with all password hashes. 
+
+LSASS Injection — Inject into LSASS to dump credentials. 
+
+---
+
+## 7. Social & Hybrid Attacks
+
+Phishing for Domain Credentials — Trick a user into revealing credentials. 
+
+Credential Reuse — Use stolen credentials from another service. 
+
+Service Account Abuse — Target accounts with excessive privileges. 
+
+---
+
+## Core Goals of AD Attacks
+
+Obtain Credentials — Passwords, hashes, and Kerberos tickets.
+
+Escalate Privileges — Move from a normal account to admin or Domain Controller.
+
+Persistence — Maintain long-term access and survive cleanup efforts.
+
+---
+
+## References
+
+MITRE ATT&CK - Enterprise Techniques: https://attack.mitre.org/matrices/enterprise/
+
+ADSecurity.org: https://adsecurity.org/
+
+Harmj0y’s Blog: http://blog.harmj0y.net/
+
+
 # Permissions
 chmod +x         # add execute permission
 chmod 777        # read, write, execute for all
