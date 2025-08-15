@@ -75,12 +75,4 @@ systemctl enable postgresql         # start PostgreSQL at boot
 python3 -m http.server 80           # start Python web server
 
 
-# Tools for exploiting AD
-
-bloodhound - used to map relationships within an Active Directory, Entra, and Azure environments.
-bloodyAD - Used to perform AD priv escalation 
-targetedKeroberos - can perform a number of Keroberoasting attacks
-gMSADumper - Reads any gMSA password blobs the user can access and parses the values.
-
-
 
