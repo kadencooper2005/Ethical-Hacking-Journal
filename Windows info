@@ -107,3 +107,47 @@ MITRE ATT&CK - Enterprise Techniques: https://attack.mitre.org/matrices/enterpri
 ADSecurity.org: https://adsecurity.org/
 
 Harmj0y’s Blog: http://blog.harmj0y.net/
+
+
+# Tools for exploiting AD
+
+bloodhound - used to map relationships within an Active Directory, Entra, and Azure environments.
+
+bloodyAD - Used to perform AD priv escalation 
+
+targetedKeroberos - can perform a number of Keroberoasting attacks
+
+gMSADumper - Reads any gMSA password blobs the user can access and parses the values.
+
+
+
+
+# AD permissions
+
+GenericAll – Full control over the object, including password and group membership changes.
+
+GenericWrite – Can modify most attributes of an object, but not full control.
+
+WriteSPN – Allows writing Service Principal Names, enabling Kerberoasting attacks.
+
+ResetPassword – Lets you reset the user’s password.
+
+AddMember – Permission to add a user to a group.
+
+RemoveMember – Permission to remove a user from a group.
+
+WriteDacl – Modify the object’s permissions (ACL).
+
+WriteOwner – Change ownership of the object.
+
+ValidatedWriteTo – Modify security-sensitive attributes like SID history or UPN.
+
+ValidatedWriteToSamAccountName – Specifically allows changing the SAM account name safely.
+
+ReadProperty – Read specific attributes of an object.
+
+WriteProperty – Write specific attributes of an object.
+
+AllExtendedRights – Perform extended actions like “Reset Password” or “Send As.”
+
+RemoteControl – Control a computer remotely (usually for workstation or server objects).
