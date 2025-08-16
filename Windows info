@@ -119,7 +119,23 @@ targetedKeroberos - can perform a number of Keroberoasting attacks
 
 gMSADumper - Reads any gMSA password blobs the user can access and parses the values.
 
+crackmapexec (CME) is a post-exploitation tool used mainly for Active Directory environments.
+It allows you to:
+- Enumerate information (users, shares, OS versions, domain info)
+- Authenticate using credentials, NTLM hashes, or Kerberos tickets
+- Execute commands remotely
 
+Supported Protocols:
+--------------------
+- SMB
+- RDP
+- WinRM
+- LDAP
+- MSSQL
+
+Basic Syntax:
+-------------
+crackmapexec <protocol> <target(s)> [options]
 
 
 # AD permissions
@@ -153,26 +169,10 @@ AllExtendedRights – Perform extended actions like “Reset Password” or “S
 RemoteControl – Control a computer remotely (usually for workstation or server objects).
 
 
-# Tools to use against AD
 
-crackmapexec (CME) is a post-exploitation tool used mainly for Active Directory environments.
-It allows you to:
-- Enumerate information (users, shares, OS versions, domain info)
-- Authenticate using credentials, NTLM hashes, or Kerberos tickets
-- Execute commands remotely
 
-Supported Protocols:
---------------------
-- SMB
-- RDP
-- WinRM
-- LDAP
-- MSSQL
 
-Basic Syntax:
--------------
-crackmapexec <protocol> <target(s)> [options]
-
+Ports / Protocols
 
 use smbclient -L // <TARGET_IP> -U '<DOMAIN>\<USER>%<PASS>' to view any shares, 
 their names, type of share, and any comments.
@@ -186,5 +186,5 @@ Port 464/tcp (kpasswd5): Kerberos password change service,
 part of the AD authentication infrastructure.
 
 CPE - (Common Platform Enumeration)
-Clock Skew: - coudl affect Kerberos authentication if not synced. 
+Clock Skew: - could affect Kerberos authentication if not synced. 
 
