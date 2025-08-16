@@ -151,3 +151,40 @@ WriteProperty – Write specific attributes of an object.
 AllExtendedRights – Perform extended actions like “Reset Password” or “Send As.”
 
 RemoteControl – Control a computer remotely (usually for workstation or server objects).
+
+
+# Tools to use against AD
+
+crackmapexec (CME) is a post-exploitation tool used mainly for Active Directory environments.
+It allows you to:
+- Enumerate information (users, shares, OS versions, domain info)
+- Authenticate using credentials, NTLM hashes, or Kerberos tickets
+- Execute commands remotely
+
+Supported Protocols:
+--------------------
+- SMB
+- RDP
+- WinRM
+- LDAP
+- MSSQL
+
+Basic Syntax:
+-------------
+crackmapexec <protocol> <target(s)> [options]
+
+
+use smbclient -L // <TARGET_IP> -U '<DOMAIN>\<USER>%<PASS>' to view any shares, 
+their names, type of share, and any comments.
+
+port 445 is for SMB, should always check
+
+Port 88/tcp (Kerberos): Runs Microsoft Windows Kerberos, 
+confirming the presence of an AD environment with Kerberos authentication.
+
+Port 464/tcp (kpasswd5): Kerberos password change service, 
+part of the AD authentication infrastructure.
+
+CPE - (Common Platform Enumeration)
+Clock Skew: - coudl affect Kerberos authentication if not synced. 
+
