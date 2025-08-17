@@ -188,3 +188,26 @@ part of the AD authentication infrastructure.
 CPE - (Common Platform Enumeration)
 Clock Skew: - could affect Kerberos authentication if not synced. 
 
+
+# Windows API
+
+hackers can use windows API coupled with programming languages such as c/c++ to create what is called malware. 
+once you have creaetd malware, you can do a lot with it ddepending on your target. You can brick systems which
+is essentially turning systems into zombies, leaving them almost unusable. 
+
+hackers aren't limited to just malware, you can create backdoors for persitance, and rootkit creating. things should 
+be broken at a byte sized level! XD 
+
+a lot of hackers decided to use low-level languages because you are literally interacting with the system on a low level
+directly, this can lead to some serious attacks like mentioned above. you can hook system calls, inject DLLs, or mess 
+with processes directly. so much fun! 
+
+C++ is really fast and compiles to native code which is why it's fast and also leaves minimal footprints. 
+
+hackers use things called crypters to bypass IDS/IPS basically any Anti-Virus software so that they can transfer
+malicious payloads to their target without being exposed. the method is simple. crypters encrypt malicous code
+changing it's appearance without interferring without it's overall functionality, this makes it harder to
+detect/reverse-engineer.
+
+
+
