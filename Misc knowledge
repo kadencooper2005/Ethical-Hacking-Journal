@@ -1,0 +1,23 @@
+
+# OS internals
+
+this includes knowledge about the lower-level system, inlcuding the Kernel. 
+The kernel could be considered the "Heart" of the OS, as it is responsible for many things such as memory management,
+I/O, devices, processors, and system calls. exploiting the kernal would lead to full take over of the OS itself. 
+
+this could be dangerous if abused; potentially leading to a bricked system aka (BSOD on Windows, and Kernel Panick in Linux)
+
+There are a various amount of ways to exploit the OS on a lower level via process injection, overflow attacks, binary exploitation
+and so on. 
+
+most of the time, when working with the OS on a lower level, you'll use programming languages such as C and Assembly for more
+accurate and precise control over the system itself. 
+
+unlike userland exploits, kernel exploits will survive a reboot if a rootkit or module is installed 
+
+Kernel-level rootkits can hide themselves from almost every tool (task manager, antivirus, ls/ps commands).
+
+You own the machine: every file, process, network connection is yours if exploited properly. 
+
+
+
