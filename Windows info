@@ -137,6 +137,16 @@ Basic Syntax:
 -------------
 crackmapexec <protocol> <target(s)> [options]
 
+impacket-smb
+impacket-getTGT <Domain>/'<Username>':'<Password>'
+this will get the ticket for the user, that you can then save and use
+export KRB5CCNAME=path/to/folder
+
+office2john
+
+a Python script that plays a key role in recovering forgotten or lost passwords for 
+password-protected Microsoft Office files.
+
 
 # AD permissions
 
