@@ -1,0 +1,159 @@
+Machine: vouyer (Windows)
+General Info
+
+  IP: 10.10.11.76
+
+Credentials
+
+  ryan.naylor / HollowOct31Nyt
+
+  svc_ldap / M1XyC9pW7qT5Vn
+
+  svc_iis / N5pXyV1WqM7CZ8
+
+Open Ports (Nmap)
+
+  53 – domain
+
+  88 – kerberos-sec
+
+  135 – msrpc
+
+  139 – netbios-ssn
+
+  189 – ldap
+
+  445 – microsoft-ds
+
+  464 – kpasswd5
+
+  593 – ncacn_http
+
+  636 – tcpwrapped
+
+  2222 – ssh
+
+  3268 – ldap
+
+  3269 – tcpwrapped
+
+  5985 – http
+
+Potential SMB access: yes
+
+Attack Path / Process
+Recon & Initial Enumeration
+
+  Ran an Nmap scan to identify open ports.
+
+  Found services tied to AD, Kerberos, SMB, and LDAP.
+
+  Pivoted into BloodHound for Active Directory mapping.
+
+Credential Discovery
+
+  With provided credentials, generated a Kerberos ticket.
+
+  Using BloodHound, found that user ryan.naylor is in First-Line Support group.
+
+  Group had access to an encrypted ZIP file with user/password data.
+
+  Extracted ZIP password using office2john + john → password = football.
+
+  Decrypted archive and found credentials:
+
+  svc_ldap / M1XyC9pW7qT5Vn
+
+  svc_iis / N5pXyV1WqM7CZ8
+
+  Privilege Escalation via Kerberos
+
+  Verified that svc_ldap → lacey.miller@voleur.htb has GenericWrite permissions.
+
+  Generated Kerberos ticket for svc_ldap.
+
+  Dumped hashes for lacey and svc_winrm via targeted Kerberoasting.
+
+  Found hash for svc_winrm.
+
+Shell Access
+
+  Created .ccache ticket for svc_winrm.
+
+  Used evil-winrm with Kerberos ticket to gain initial shell.
+
+  Retrieved user.txt flag.
+
+Lateral Movement / Pivoting
+
+  Uploaded RunasCs.exe to pivot from svc_winrm → svc_ldap (since direct login was blocked).
+
+  Started nc listener on port 6666.
+
+  Ran RunasCs.exe → gained reverse shell as svc_ldap.
+
+  Discovered deleted user todd.wolfe.
+
+  Restored account, generated Kerberos ticket.
+
+  Enumerated shares with impacket-smbclient.
+
+  Found DPAPI-encrypted data + key.
+
+  Pulled data to local machine.
+
+  Decrypted DPAPI material with impacket-dpapi.
+
+  Extracted credentials for jeremy.combs.
+
+More Privilege Escalation
+
+  Generated Kerberos ticket for jeremy.combs.
+
+  BloodHound showed jeremy also had SMB access.
+
+Found:
+
+  id_rsa private key
+
+  Note.txt.txt
+
+Fixed key permissions (chmod 600 id_rsa).
+
+  Used SSH with key → logged in as svc_backup on port 2222.
+
+Domain Admin
+
+  Found SYSTEM and NTDS.dit files.
+
+  Exfiltrated them via nc -lvnp 8888 > SYSTEM / ntds.dit.
+
+  Parsed with impacket-secretsdump → dumped hashes.
+
+  Cracked Administrator NT hash.
+
+  Generated Kerberos ticket for Administrator.
+
+  Used evil-winrm to log in as Administrator.
+
+  Retrieved root.txt flag.
+
+Summary of Attack Path
+
+  Low-priv creds (ryan.naylor) → BloodHound AD insights.
+
+  Decrypted ZIP → more creds (svc_ldap, svc_iis).
+
+  Targeted Kerberoasting → gained svc_winrm hash.
+
+  Evil-WinRM shell as svc_winrm.
+
+  Pivot to svc_ldap with RunasCs.
+
+  Restored deleted user todd.wolfe → found DPAPI material → cracked creds for jeremy.combs.
+
+  SSH pivot via id_rsa → svc_backup.
+
+  NTDS dump + secretsdump → Administrator hash.
+
+  Evil-WinRM as Administrator → full compromise.
