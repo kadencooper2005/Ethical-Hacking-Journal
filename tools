@@ -24,3 +24,5 @@ mimikatz - Mimikatz is a post-exploitation tool requiring administrative access 
 which manages user authentication and stores credentials for logged-in users
 
 hydra - a reverse engineering tool, can help understand malware and or any malicious code / files etc. 
+
+rpcclient - command-line tool to interact with Windows RPC/SMB services, heavily used in enumeration and AD recon.
