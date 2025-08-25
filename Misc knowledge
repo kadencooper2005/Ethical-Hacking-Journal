@@ -20,4 +20,48 @@ Kernel-level rootkits can hide themselves from almost every tool (task manager, 
 You own the machine: every file, process, network connection is yours if exploited properly. 
 
 
+#  Cyber Kill Chain
+
+The **Cyber Kill Chain** (developed by Lockheed Martin) is a model for understanding the phases of a cyberattack.  
+It helps defenders identify where they can detect, deny, disrupt, or contain an attack.
+
+##   Stages
+
+1. **Reconnaissance**
+   - Attacker gathers information about the target (e.g., ports, services, employees).
+   - Goal: Identify weak points.
+
+2. **Weaponization**
+   - Combine exploit + payload into a “weapon.”
+   - Example: malicious PDF, Word doc with macro, exploit-laden executable.
+
+3. **Delivery**
+   - Send the weapon to the victim.
+   - Channels: phishing, USB drop, malicious website, supply chain.
+
+4. **Exploitation**
+   - Code execution on the target system.
+   - Example: buffer overflow, macro execution.
+
+5. **Installation**
+   - Establish persistence by installing malware/backdoor.
+   - Example: registry changes, scheduled tasks, services.
+
+6. **Command & Control (C2)**
+   - Attacker connects to the compromised host to issue commands.
+   - Techniques: HTTP/S beaconing, DNS tunneling, custom protocols.
+
+7. **Actions on Objectives**
+   - Final goal of the campaign: data exfiltration, lateral movement, disruption, ransomware.
+
+---
+
+##  Defensive Use
+
+- **Detect early:** Spot recon or phishing attempts.  
+- **Disrupt mid-chain:** Block installs, isolate C2.  
+- **Contain late:** Limit lateral movement, protect crown jewels.  
+
+>  *The earlier you break the chain, the cheaper and easier the defense.*
+
 
