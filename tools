@@ -1,1 +1,26 @@
 
+smbclient - this tool is used to check shared between users. shares can expose sensitive data that isn't meant to be shown. 
+
+impacket - this tool is used a lot for AD enumeration/exploitation. you can use impacket-getTGT to generate a Kerberos ticket to gain access to user
+accounts within AD to enumerate and further privs. 
+
+bloodhound - use this tool to explore the current AD, useful for AD enumeration.
+
+nmap - simple but reliable port scanner, can also detect services in use and their current versions. 
+
+burpsuite - this tool is used to intercept web traffic so that it can be viewed/altered. 
+
+wireshark - Wireshark is a free, open-source network protocol analyzer used to capture and inspect network traffic in real-time, allowing professionals to troubleshoot network issues, diagnose security problems, 
+and understand network communications at the packet level.
+
+john the ripper - John the Ripper (JtR) is a free and open-source password-cracking tool used for security auditing and password recovery
+
+hashcat - Hashcat is a file craker, used to decrypt file hashes. 
+
+nikto - web server vulnerability scanner that performs comprehensive tests to identify security issues like outdated software, dangerous files,
+insecure configurations, and default settings
+
+mimikatz - Mimikatz is a post-exploitation tool requiring administrative access to a system. It targets the LSASS process, 
+which manages user authentication and stores credentials for logged-in users
+
+hydra - a reverse engineering tool, can help understand malware and or any malicious code / files etc. 
