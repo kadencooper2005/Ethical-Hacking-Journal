@@ -26,3 +26,8 @@ which manages user authentication and stores credentials for logged-in users
 hydra - a reverse engineering tool, can help understand malware and or any malicious code / files etc. 
 
 rpcclient - command-line tool to interact with Windows RPC/SMB services, heavily used in enumeration and AD recon.
+
+certipy-ad - Certipy-ad is an offensive and defensive toolkit for enumerating and 
+exploiting misconfigurations in Active Directory Certificate Services (AD CS).
+
+impacet-dacledit - modifies Active Directory object permissions. 
