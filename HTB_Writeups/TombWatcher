@@ -1,1 +1,86 @@
+Machine info: TombWatcher.htb (Windows) 
+
+Default creds: henry/h3nry_987TGV!
+
+I first started off with a simple network scan to identify any open ports / services and their service versions
+this returned a list of open ports of course, port 5985 was open - WinRM exist, might be vulnerable. 
+
+I checked the HTTP ports, 80 in this case. there was nothing of much interest. 
+
+I used bloodhound to get a clearer picture of the user's AD enviroment and their current
+privs, and found out that Henry has WriteSPB permissions to the user Alfred.
+
+I downloaded a tool called targetedKerberoast, gave the domain, user, and password
+and this successfully dumped alfreds password hash. 
+
+I put the hash into a file called hash.txt, used john to blast it, and received the 
+password 'basketball'
+
+I ran bloodhound again, but this time as alfred, Alfred has AddSelf permissions to 
+the group INFRASTRUCTURE, so I used bloodyAD; provided the DC address, domain, user,
+password and then 'add groupMember INFRASTRUCTURE alfred' to add alfred to the group :)
+
+using bloodhound, I also figured out that the user ansible_dev$ has ReadGMSAPassword
+permissions and is apart of the infrastructure group aswell. 
+
+I used a tool called gMSADumper to dump ansibles hash, then I used his hash to run 
+an instance of bloodhound for further enumeration. 
+
+ansible has ForceChangePassword permissions for the user account Sam, so I used
+bloodyAD to change Sams password to 'Abc123456!' for simplicity ;)
+
+I used bloodhound again, this time for sam, and found that sam had WriteOwner
+permissions to a user called John, so I used bloodyAD to make Sam the new owner of 
+John's account, then I gave Sam GenericAll permissions to John's account. 
+
+I then simply changed John's password, used evil-winrm to log in, and navigated to 
+John's Desktop, and received the user.txt flag!
+
+Privilege Escalation:
+
+I noticed that in bloodhound, John has GenericAll permissions to the OU ADCS.
+Knowing this, I used impacket-dacledit to give John full control of the OU as-well 
+as Read/Write permissions.
+
+There were two users: cert_admin, and cert_adm. I targeted cert_admin because
+John has GenericAll permissions for that account. I used bloodyAD to changed
+cert_admins password, it was successful but I was given this error: 
+No object found in DC=tombwatcher,DC=htb with filter: (sAMAccountName=cert_admin).
+
+I got stuck at this point because I didn't know what to do, but with a quick 
+google search, I found out all I had to do was restore the account via the 
+Powershell I established connecting to the john account, so I used these commmands:
+Get-ADObject -Filter 'isDeleted -eq $true' -IncludeDeletedObjects
+
+which gave me a list of deleted user accounts, one of them was cert_admin, so I 
+restored the account, enabled it, and reset the password. 
+
+Restore-ADObject -Identity 938182c3-bf0b-410a-9aaa-45c8e1a02ebf
+Enable-ADAccount -Identity cert_admin
+Set-ADAccountPassword -Identity cert_admin -Reset -NewPassword 
+(ConvertTo-SecureString "Abc123456@" -AsPlainText -Force)
+
+I used certipy to find any vulns within the certificate services and 
+found that ESC15 was in use. 
+
+I did a quick lookup, and it turns out that this is vulnerable to RCE! 
+
+I then used this command to request a certificate for the admin account:
+
+certipy req \
+    -u 'cert_admin@tombwatcher.htb' -p 'Abc123456@' \
+    -dc-ip '10.10.11.72' -target 'DC01.tombwatcher.htb' \
+    -ca 'tombwatcher-CA-1' -template 'WebServer' \
+    -upn 'administrator@tombwatcher.htb'  \
+    -application-policies 'Client Authentication'
+
+I then authecticated and started a ldap shell:
+certipy auth -pfx 'administrator.pfx' -dc-ip '10.10.11.72' -ldap-shell
+
+once I was logged in via the shell, I changed the password for the admin account.
+
+once the password was changed, I used evil-winrm to login as admin, I navigated
+to admins Desktop, and retrieved the root.txt flag!
+
+
 
