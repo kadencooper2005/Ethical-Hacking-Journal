@@ -1,1 +1,57 @@
+Machine Info: Environment (Linux)
+
+Open ports:
+80 - http
+22 - ssh 
+
+
+Process:
+
+first I started off with a Nmap scan to find open ports and what servies w/ service versions are running. 
+Found port 80 was open so I visited the web page and was brought to a landing page. 
+
+there wasn't anything too interesting on the landing page, so I used gobuster to find hidden dirs and find a couple:
+/login
+/storage
+/upload
+
+these were the most interesting ones, I visited the login page and was greeted with a login form. 
+I visited the storage endpoint and git a 404 error
+I then visited the upload endopint and discovered more about the target; the target was using php w/ a vulnerable version of laravel. 
+
+this version is suseptible to XSS and cred leakage. 
+
+I started up burp, caught a login request and played around with the parameters, if you modify the stay logged in param to 1, it brings you to the same page that 
+loads if you visit /upload, but this one tells you that if you set it to True, you can stay logged in and that if you set the enviroment to production,
+you can log in as the dev account. so I did just that and logged in. I landed on a dashboard page that had a file upload option (I'm thinking LFI) 
+I create a reverse shell script called shell.php, test what files are accepted for uploading a test.jpeg file, noted the storage path to be /storage/files/<FILE_NAME>
+
+I then embedded my shell.php file into the test.jpeg image file, started a netcat lister that redirected to my machine on port 4444, uploaded the file,
+and got back an unstable shell. I stabalized the shell using: python3 'import pty; pty.spawn("/bin/bash")' and had a stable shell.
+
+I then navigated to the home dir and found user.txt flag!
+
+Priv Escalation:
+
+first I further enumerated the machine, Exploring /home/hish/backup revealed a keyvault.gpg file. 
+I copied hish’s .gnupg folder to /tmp and decrypted it using the command:
+
+cp -R /home/hish/.gnupg /tmp && GNUPGHOME=/tmp/.gnupg gpg --decrypt /home/hish/backup/
+keyvault.gpg. 
+
+this gave me the following creds:
+
+"hish_ <hish@environment.htb>"
+PAYPAL.COM -> Ihaves0meMon$yhere123
+ENVIRONMENT.HTB -> marineSPm@ster!!
+FACEBOOK.COM -> summerSunnyB3ACH!!
+
+I used one of the set to SSH into hishes account, I then ran sudo -l to see his permissons, hish 
+has access to /usr/bin/systeminfo
+
+I created a malicious script: echo 'bash -p' > /tmp/root.sh.
+I then made it executable: chmod x+ root.sh
+Then I set the environment: sudo ENV=/tmp/root.sh && BASH_ENV=/tmp/root.sh /usr/bin/systeminfo.
+
+ran the script, had root, and proceeded to get the flag located in /root/root.txt
 
