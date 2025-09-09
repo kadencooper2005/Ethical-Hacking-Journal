@@ -65,3 +65,25 @@ It helps defenders identify where they can detect, deny, disrupt, or contain an 
 >  *The earlier you break the chain, the cheaper and easier the defense.*
 
 
+Encryption: encryption is when you take data, randomize the data so that no one
+can read it unless they decrypt it using a key. 
+
+there are two forms of encryption: Symmetric-key encryption, Asymmetric-encryption.
+
+Symmetric Encryption
+   Keys: One single key, shared by both sender and receiver.
+   Usage: The same key encrypts and decrypts.
+   Pros: Fast, efficient, good for encrypting large amounts of data.
+   Cons: Key distibution is the tricky part — if someone intercepts the key, security is broken.
+
+ Example: AES (Advanced Encryption Standard).
+
+Asymmetric Encryption
+   Keys: Two mathematically related keys: a public key and a private key.
+   Usage: What one key encrypts, only the other can decrypt.
+   Public key → encrypts messages.
+   Private key → decrypts messages.
+   Pros: Solves the key distribution problem — you don’t need to secretly share a private key.
+   Cons: Slower than symmetric encryption, so usually used for smaller data (like sharing a symmetric key, then switching to symmetric).
+
+ Example: RSA or ECC.
