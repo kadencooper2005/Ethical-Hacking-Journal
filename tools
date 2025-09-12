@@ -31,3 +31,23 @@ certipy-ad - Certipy-ad is an offensive and defensive toolkit for enumerating an
 exploiting misconfigurations in Active Directory Certificate Services (AD CS).
 
 impacet-dacledit - modifies Active Directory object permissions. 
+
+Splunk - It acts as a central hub for collecting, indexing, and processing large volumes of structured, 
+semi-structured, and unstructured data in real-time, providing dashboards, reports, 
+and alerts to help users quickly detect issues, 
+understand events, and respond to threats
+
+used mainly in defensive security - it is a kind of Software
+
+ELK Stack - a suite of three open-source tools—Elasticsearch, Logstash, and Kibana—that work together 
+to provide a powerful platform for data collection, 
+analysis, and visualization
+
+Dive deeper into python libs that partake in Exploit/Malware developkment
+
+Pwntools
+Scapy - basically used to deal with packets/ Network-based exploits
+Angr - binary analysis, finds vulns etc
+Barf - binary analysis & reverse engineering - is x86 and ARM archictecure
+compatible.
+Capstone - lightweight multi-platform, multi-architecture disassembly framework
