@@ -76,3 +76,46 @@ python3 -m http.server 80           # start Python web server
 
 
 
+ROP chain (Return-Oriented Programming)
+
+Modern systems use security features like DEP (Data Execution Prevention) to stop code execution 
+from memory regions like the stack. 
+That means classic buffer overflow exploits that inject shellcode directly 
+into the stack often fail because that memory is marked non-executable.
+
+How ROP works:
+Instead of injecting new code, you reuse existing code from the binary or libraries already loaded into memory.
+You look for short instruction sequences ending with ret (called gadgets).
+
+You chain gadgets together to perform complex actions, like calling system("/bin/sh").
+You build a “chain” of return addresses so when your overflow triggers, execution jumps through these gadgets.
+Key takeaway: ROP is about turning the program’s own code into a scripting language to bypass DEP.
+
+
+Shellcode Writing
+What it is:
+Shellcode is small, position-independent machine code used as a payload in exploits. Traditionally, 
+it spawns a shell (/bin/sh), but modern shellcode can also:
+
+Download and execute files
+Open reverse TCP connections
+Escalate privileges
+
+How you do it:
+Write simple assembly (x86 or x64) to perform system calls (like execve).
+Assemble it with tools like nasm.
+Extract the raw bytes and inject them into your exploit payload.
+Key constraint: Shellcode must avoid null bytes (\x00) because they terminate strings in vulnerable programs.
+
+
+ASLR and DEP Bypass
+
+What they are:
+ASLR (Address Space Layout Randomization): Randomizes memory addresses of key program areas (stack, heap, libraries) so you can’t reliably jump to them.
+DEP (Data Execution Prevention): Marks memory pages as non-executable to prevent direct shellcode execution.
+
+How attackers bypass these:
+Info leaks: Use bugs to leak memory addresses, defeating ASLR.
+ROP chains: As discussed, use ROP to avoid DEP entirely.
+JIT spraying / heap spraying: Fill memory with predictable patterns.
+Return-to-libc: Jump directly into library functions (like system()) instead of shellcode.
