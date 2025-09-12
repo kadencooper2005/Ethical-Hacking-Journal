@@ -87,3 +87,41 @@ Asymmetric Encryption
    Cons: Slower than symmetric encryption, so usually used for smaller data (like sharing a symmetric key, then switching to symmetric).
 
  Example: RSA or ECC.
+
+
+
+Buffer Overflow attacks (Heap) (Stack)
+
+Stack-Overflow - Is when you dump too much data until it overflows which can 
+overwrite important data like the return address (Where the CPU goes next)
+
+you can overwrite the return address so the program jumpts to your malicious
+code instead, then execute it. 
+
+Heap-Overflow - It’s used for dynamic memory (malloc(), new), not tied to a single function.
+Memory chunks are allocated and freed as needed.
+
+happens when you write past the end of one chunk and into another chunk
+or into heap metadata
+
+You can overwrite function pointers, vtables, or malloc metadata.
+This leads to code execution or privilege escalation, but is trickier than stack overflows.
+
+ROP chains - links of gadgets that are already present in a programs binary
+or libs (like libc)
+each gadget ends with ret instruction
+you chain them together so execution "returns" into each gadget one 
+after the other
+This lets you execute arbitrary logic without injecting new code.
+
+DEP (Data Execution Prevention) - makes the stack non-executable
+so you can't drop shellcode onto the stack anymore - ROP chains help by 
+allowing attackers to reuse existing code to bypass DEP to eventually 
+run shellcode. 
+
+ASLR (Address Space Layout Randomization) is a defense mechanism that makes memory 
+addresses unpredictable every time a program runs.
+
+These memory regions get randomized at runtime, 
+so the attacker doesn’t know where their target code or data is.
+
