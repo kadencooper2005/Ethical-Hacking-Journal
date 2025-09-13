@@ -119,3 +119,5 @@ Info leaks: Use bugs to leak memory addresses, defeating ASLR.
 ROP chains: As discussed, use ROP to avoid DEP entirely.
 JIT spraying / heap spraying: Fill memory with predictable patterns.
 Return-to-libc: Jump directly into library functions (like system()) instead of shellcode.
+
+
