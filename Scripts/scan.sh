@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefall
+set -euo pipefall # fallback in case script fails 
 
 TARGET="${1:-}"
 if [ -z "$TARGET" ]; then
