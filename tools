@@ -51,3 +51,13 @@ Angr - binary analysis, finds vulns etc
 Barf - binary analysis & reverse engineering - is x86 and ARM archictecure
 compatible.
 Capstone - lightweight multi-platform, multi-architecture disassembly framework
+
+httpx-tools / httpx - fast web recon tool. 
+
+nuclei - web vuln scanner. 
+
+nikto - web server vulnerability scanner
+
+ffuf - a fast web fuzzer written in Go, used for discovering directories, files, 
+and vulnerabilities in web applications.
+
