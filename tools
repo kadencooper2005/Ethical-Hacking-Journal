@@ -61,3 +61,7 @@ nikto - web server vulnerability scanner
 ffuf - a fast web fuzzer written in Go, used for discovering directories, files, 
 and vulnerabilities in web applications.
 
+amass -  is an open-source tool used for network mapping and asset discovery, 
+primarily by information security professionals. It helps identify subdomains, 
+perform DNS enumeration, and visualize relationships between discovered assets to assess potential vulnerabilities
+
